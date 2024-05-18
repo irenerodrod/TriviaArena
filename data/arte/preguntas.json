@@ -1,0 +1,16 @@
+[
+    {
+        "pregunta": "¿Quién pintó la Mona Lisa?",
+        "opciones": ["Leonardo da Vinci", "Michelangelo", "Donatello", "Claude Monet"],
+        "respuesta_correcta": "Leonardo da Vinci"
+    },
+    {
+        "pregunta": "¿Cuál es la obra más famosa de Renoir?",
+        "opciones": ["La Moulin de la Galette", "El caballero de la noche", "Los girasoles", "Guernica"],
+        "respuesta_correcta": "La Moulin de la Galette"
+    },
+    {
+        "pregunta": "¿Qué movimiento artístico está asociado con Salvador Dalí?",
+        
+    }
+]

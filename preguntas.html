@@ -6,13 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TriviaArena - Preguntas</title>
     <link rel="stylesheet" type="text/css" href="css/style.css">
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
-    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="css/animate.css">
-    <link rel="stylesheet" type="text/css" href="css/lightbox.css">
-    <link rel="stylesheet" type="text/css" href="css/main.css">
-
 </head>
 
 <body>
@@ -22,8 +15,92 @@
 
     <main>
         <section class="container">
-            <!--Aquí se muestran las preguntas y respuestas-->
-            
+            <!-- Aquí se muestran las preguntas y respuestas -->
+            <div id="pregunta"></div>
+            <ul id="opciones"></ul>
+            <button id="siguiente">Siguiente pregunta</button>
+        </section>
     </main>
+
+    <footer>
+        <h2>TriviaArena - Preguntas y respuestas</h2>
+        <p>Copyright &copy; 2024</p>
+    </footer>
+
+    <script>
+        // JavaScript para controlar los diferentes modos
+        document.addEventListener("DOMContentLoaded", (event) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const modo = urlParams.get("modo") || "individual";
+            const categoria = urlParams.get("categoria") || "arte";
+            const preguntaDiv = document.getElementById("pregunta");
+            const opcionesUl = document.getElementById("opciones");
+            const botonSiguiente = document.getElementById("siguiente");
+
+            let preguntas = [];
+            let preguntaActual = 0;
+
+            function cargarModo(modo, categoria) {
+                switch (modo) {
+                    case "individual":
+                    case "general":
+                    case "mixto":
+                    case "random":
+                    case "dificil":
+                        cargarPreguntas(`/${categoria}/preguntas.json`);
+                        break;
+                    default:
+                        preguntaDiv.innerText = "Selecciona un modo de juego.";
+                }
+            }
+
+            function cargarPreguntas(url) {
+                fetch(url)
+                    .then((response) => response.json())
+                    .then(data => {
+                        preguntas = data;
+                        mostrarPregunta();
+                    })
+                    .catch(error => {
+                        console.error("Error al cargar las preguntas:", error);
+                        preguntaDiv.innerText = "Error al cargar las preguntas.";
+                    });
+            }
+
+            function mostrarPregunta() {
+                if (preguntaActual < preguntas.length) {
+                    const pregunta = preguntas[preguntaActual];
+                    preguntaDiv.innerText = pregunta.pregunta;
+                    opcionesUl.innerHTML = '';
+                    pregunta.opciones.forEach(opcion => {
+                        const li = document.createElement('li');
+                        li.innerText = opcion;
+                        li.addEventListener('click', () => verificarRespuesta(opcion, pregunta.respuesta_correcta));
+                        opcionesUl.appendChild(li);
+                    });
+                } else {
+                    preguntaDiv.innerText = "Has completado todas las preguntas.";
+                    opcionesUl.innerHTML = '';
+                    botonSiguiente.style.display = 'none';
+                }
+            }
+
+            function verificarRespuesta(opcionSeleccionada, respuestaCorrecta) {
+                if (opcionSeleccionada === respuestaCorrecta) {
+                    alert("¡Correcto!");
+                } else {
+                    alert("Incorrecto. La respuesta correcta es: " + respuestaCorrecta);
+                }
+                preguntaActual++;
+                mostrarPregunta();
+            }
+
+            botonSiguiente.addEventListener('click', mostrarPregunta);
+
+            // Llamar a la función principal para cargar preguntas según el modo y la categoría
+            cargarModo(modo, categoria);
+        });
+    </script>
 </body>
+
 </html>
