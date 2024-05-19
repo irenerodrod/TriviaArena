@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TriviaArena - Preguntas</title>
     <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
-
 <body>
     <header>
         <h1>TriviaArena - Preguntas</h1>
@@ -28,10 +26,9 @@
     </footer>
 
     <script>
-        // JavaScript para controlar los diferentes modos
-        document.addEventListener("DOMContentLoaded", (event) => {
+        document.addEventListener("DOMContentLoaded", () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const modo = urlParams.get("modo") || "individual";
+            const modo = urlParams.get("modo") || "una_categoria";
             const categoria = urlParams.get("categoria") || "arte";
             const preguntaDiv = document.getElementById("pregunta");
             const opcionesUl = document.getElementById("opciones");
@@ -42,33 +39,47 @@
 
             function cargarModo(modo, categoria) {
                 switch (modo) {
-                    case "individual":
-                    case "general":
-                    case "mixto":
-                    case "random":
-                    case "dificil":
+                    case "una_categoria":
                         cargarPreguntas(`/${categoria}/preguntas.json`);
                         break;
+                    case "mixto":
+                        // Aquí cargarías un archivo o método para mezclar preguntas de varias categorías
+                        cargarPreguntas(`/mixto/preguntas.json`);
+                        break;
+                    case "dificil":
+                        // Método para cargar preguntas más difíciles, probablemente filtrado por alguna propiedad
+                        cargarPreguntas(`/${categoria}/preguntas_dificiles.json`);
+                        break;
                     default:
-                        preguntaDiv.innerText = "Selecciona un modo de juego.";
+                        preguntaDiv.innerText = "Modo de juego no soportado.";
+                        botonSiguiente.style.display = 'none';
                 }
             }
 
             function cargarPreguntas(url) {
                 fetch(url)
-                    .then((response) => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        preguntas = data;
+                        if (!data || !data.categorias || !data.categorias[categoria]) {
+                            throw new Error("No se encontraron preguntas para esta categoría.");
+                        }
+                        preguntas = data.categorias[categoria];
                         mostrarPregunta();
                     })
                     .catch(error => {
                         console.error("Error al cargar las preguntas:", error);
-                        preguntaDiv.innerText = "Error al cargar las preguntas.";
+                        preguntaDiv.innerText = "Error al cargar las preguntas: " + error.message;
+                        botonSiguiente.style.display = 'none';
                     });
             }
 
             function mostrarPregunta() {
-                if (preguntaActual < preguntas.length) {
+                if (preguntas.length > 0 && preguntaActual < preguntas.length) {
                     const pregunta = preguntas[preguntaActual];
                     preguntaDiv.innerText = pregunta.pregunta;
                     opcionesUl.innerHTML = '';
@@ -79,7 +90,7 @@
                         opcionesUl.appendChild(li);
                     });
                 } else {
-                    preguntaDiv.innerText = "Has completado todas las preguntas.";
+                    preguntaDiv.innerText = "No hay preguntas disponibles.";
                     opcionesUl.innerHTML = '';
                     botonSiguiente.style.display = 'none';
                 }
@@ -91,16 +102,18 @@
                 } else {
                     alert("Incorrecto. La respuesta correcta es: " + respuestaCorrecta);
                 }
-                preguntaActual++;
-                mostrarPregunta();
+                if (preguntaActual < preguntas.length - 1) {
+                    preguntaActual++;
+                    mostrarPregunta();
+                } else {
+                    botonSiguiente.style.display = 'none';
+                }
             }
 
             botonSiguiente.addEventListener('click', mostrarPregunta);
 
-            // Llamar a la función principal para cargar preguntas según el modo y la categoría
             cargarModo(modo, categoria);
         });
     </script>
 </body>
-
 </html>

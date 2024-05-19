@@ -8,9 +8,5 @@
         "pregunta": "¿Cuál es la obra más famosa de Renoir?",
         "opciones": ["La Moulin de la Galette", "El caballero de la noche", "Los girasoles", "Guernica"],
         "respuesta_correcta": "La Moulin de la Galette"
-    },
-    {
-        "pregunta": "¿Qué movimiento artístico está asociado con Salvador Dalí?",
-        
     }
 ]
